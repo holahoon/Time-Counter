@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="styles2.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="timer">
+      <div class="timer_controls">
+        <button data-time="30" class="timer_button">30 seconds</button>
+        <button data-time="300" class="timer_button">5 minutes</button>
+        <button data-time="900" class="timer_button">15 minutes</button>
+        <button data-time="1800" class="timer_button">30 minutes</button>
+        <button data-time="3600" class="timer_button">1 hour</button>
+
+        <form name="customForm" id="custom" action="">
+          <input name="minutes" type="number" placeholder="Enter Minutes" />
+        </form>
+      </div>
+
+      <div class="display">
+        <h1 class="display_time">00:00</h1>
+        <p class="display_message"></p>
+        <button class="display_reset">Reset</button>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      let countdown;
+      const display_time = document.querySelector(".display_time");
+      const display_message = document.querySelector(".display_message");
+      const buttons = document.querySelectorAll("[data-time]");
+      const reset_button = document.querySelector(".display_reset");
+
+      function timer(seconds) {
+        clearInterval(countdown); // clear the interval before running any interval
+        const currentTime = Date.now();
+        const targetTime = currentTime + seconds * 1000;
+        displayTime(seconds);
+        displayMessage(targetTime);
+
+        countdown = setInterval(() => {
+          const secondsLeft = Math.round((targetTime - Date.now()) / 1000);
+          if (secondsLeft <= 0) {
+            clearInterval(countdown);
+            display_time.textContent = "00 : 00";
+            return;
+          }
+          // display the time
+          displayTime(secondsLeft);
+          console.log(secondsLeft);
+        }, 1000);
+      }
+
+      function displayTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainderSeconds = seconds % 60;
+        const display = `${minutes < 10 ? "0" : ""}${minutes} : ${
+          remainderSeconds < 10 ? "0" : ""
+        }${remainderSeconds}`;
+        display_time.textContent = display;
+        document.title = display;
+      }
+
+      function displayMessage(timestamp) {
+        const end = new Date(timestamp);
+        const hour = end.getHours();
+        const minutes = end.getMinutes();
+        display_message.textContent = `Be back @ ${
+          hour > 12 ? hour - 12 : hour
+        } : ${minutes < 10 ? "0" : ""}${minutes}${hour > 12 ? "pm" : "am"}`;
+      }
+
+      function timerMenu() {
+        const seconds = parseInt(this.dataset.time);
+        timer(seconds);
+      }
+      buttons.forEach(button => button.addEventListener("click", timerMenu));
+
+      function reset() {
+        clearInterval(countdown);
+        display_time.textContent = "00 : 00";
+        display_message.textContent = "";
+      }
+      reset_button.addEventListener("click", reset);
+
+      // Input field (customForm)
+      document.customForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const seconds = this.minutes.value * 60; // customform's child's name = minutes
+        timer(seconds);
+        this.reset();
+      });
+    </script>
+  </body>
+</html>
